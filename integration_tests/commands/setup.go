@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/dicedb/dice/internal/logger"
 	"github.com/dicedb/dice/internal/shard"
 
 	"github.com/dicedb/dice/internal/clientio"
@@ -25,7 +26,7 @@ import (
 
 type TestServerOptions struct {
 	Port   int
-	Logger *slog.Logger
+	Logger *logger.Logger
 }
 
 //nolint:unused
@@ -69,12 +70,11 @@ func FireCommand(conn net.Conn, cmd string) interface{} {
 	args := testutils.ParseCommand(cmd)
 	_, err = conn.Write(clientio.Encode(args, false))
 	if err != nil {
-		slog.Error(
+		logger.Fatal(
 			"error while firing command",
 			slog.Any("error", err),
 			slog.String("command", cmd),
 		)
-		os.Exit(1)
 	}
 
 	rp := clientio.NewRESPParser(conn)
@@ -83,12 +83,11 @@ func FireCommand(conn net.Conn, cmd string) interface{} {
 		if err == io.EOF {
 			return nil
 		}
-		slog.Error(
+		logger.Fatal(
 			"error while firing command",
 			slog.Any("error", err),
 			slog.String("command", cmd),
 		)
-		os.Exit(1)
 	}
 	return v
 }
@@ -98,12 +97,11 @@ func fireCommandAndGetRESPParser(conn net.Conn, cmd string) *clientio.RESPParser
 	args := testutils.ParseCommand(cmd)
 	_, err := conn.Write(clientio.Encode(args, false))
 	if err != nil {
-		slog.Error(
+		logger.Error(
 			"error while firing command",
 			slog.Any("error", err),
 			slog.String("command", cmd),
 		)
-		os.Exit(1)
 	}
 
 	return clientio.NewRESPParser(conn)
@@ -144,11 +142,10 @@ func RunTestServer(ctx context.Context, wg *sync.WaitGroup, opt TestServerOption
 	}
 
 	if err != nil {
-		opt.Logger.Error("Failed to bind to a port after retries",
+		opt.Logger.Fatal("Failed to bind to a port after retries",
 			slog.Any("error", err),
 			slog.Int("retry_count", totalRetries),
 		)
-		os.Exit(1)
 		return
 	}
 
@@ -171,8 +168,7 @@ func RunTestServer(ctx context.Context, wg *sync.WaitGroup, opt TestServerOption
 				cancelShardManager()
 				return
 			}
-			opt.Logger.Error("Test server encountered an error", slog.Any("error", err))
-			os.Exit(1)
+			opt.Logger.Fatal("Test server encountered an error", slog.Any("error", err))
 		}
 	}()
 }

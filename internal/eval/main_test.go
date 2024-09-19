@@ -1,7 +1,6 @@
 package eval_test
 
 import (
-	"log/slog"
 	"os"
 	"testing"
 
@@ -10,8 +9,8 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	logger := logger.New(logger.Opts{WithTimestamp: false})
-	slog.SetDefault(logger)
+	logr := logger.New(logger.Opts{WithTimestamp: false})
+	logger.SetDefault(logr)
 
 	store := dstore.NewStore(nil)
 	store.ResetStore()

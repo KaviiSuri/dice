@@ -11,6 +11,7 @@ import (
 
 	"github.com/ohler55/ojg/jp"
 
+	"github.com/dicedb/dice/internal/logger"
 	"github.com/dicedb/dice/internal/object"
 
 	"github.com/dicedb/dice/internal/sql"
@@ -52,7 +53,7 @@ type (
 		WatchList    sync.Map                       // WatchList is a map of query string to their respective clients, type: map[string]*sync.Map[int]struct{}
 		QueryCache   *swiss.Map[string, cacheStore] // QueryCache is a map of fingerprints to their respective data caches
 		QueryCacheMu sync.RWMutex
-		logger       *slog.Logger
+		logger       *logger.Logger
 	}
 )
 
@@ -65,7 +66,7 @@ var (
 )
 
 // NewQueryManager initializes a new QueryManager.
-func NewQueryManager(logger *slog.Logger) *QueryManager {
+func NewQueryManager(logger *logger.Logger) *QueryManager {
 	WatchSubscriptionChan = make(chan WatchSubscription)
 	AdhocQueryChan = make(chan AdhocQuery, 1000)
 	return &QueryManager{

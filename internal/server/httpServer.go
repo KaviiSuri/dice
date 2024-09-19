@@ -12,6 +12,7 @@ import (
 
 	"github.com/dicedb/dice/config"
 	"github.com/dicedb/dice/internal/clientio"
+	"github.com/dicedb/dice/internal/logger"
 	"github.com/dicedb/dice/internal/ops"
 	"github.com/dicedb/dice/internal/querywatcher"
 	"github.com/dicedb/dice/internal/server/utils"
@@ -32,13 +33,13 @@ type HTTPServer struct {
 	ioChan       chan *ops.StoreResponse
 	watchChan    chan dstore.WatchEvent
 	httpServer   *http.Server
-	logger       *slog.Logger
+	logger       *logger.Logger
 }
 
 func NewHTTPServer(
 	shardManager *shard.ShardManager,
 	watchChan chan dstore.WatchEvent,
-	logger *slog.Logger,
+	logger *logger.Logger,
 ) *HTTPServer {
 	mux := http.NewServeMux()
 	srv := &http.Server{

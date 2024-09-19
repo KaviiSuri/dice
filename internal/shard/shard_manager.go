@@ -3,12 +3,12 @@ package shard
 import (
 	"context"
 	"log"
-	"log/slog"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 
+	"github.com/dicedb/dice/internal/logger"
 	"github.com/dicedb/dice/internal/ops"
 	dstore "github.com/dicedb/dice/internal/store"
 )
@@ -24,7 +24,7 @@ type ShardManager struct {
 }
 
 // NewShardManager creates a new ShardManager instance with the given number of Shards and a parent context.
-func NewShardManager(shardCount int8, watchChan chan dstore.WatchEvent, logger *slog.Logger) *ShardManager {
+func NewShardManager(shardCount int8, watchChan chan dstore.WatchEvent, logger *logger.Logger) *ShardManager {
 	shards := make([]*ShardThread, shardCount)
 	shardReqMap := make(map[ShardID]chan *ops.StoreOp)
 	globalErrorChan := make(chan *ShardError)

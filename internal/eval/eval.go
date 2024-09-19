@@ -14,6 +14,7 @@ import (
 	"unicode"
 	"unsafe"
 
+	"github.com/dicedb/dice/internal/logger"
 	"github.com/dicedb/dice/internal/object"
 	"github.com/rs/xid"
 
@@ -2901,7 +2902,7 @@ func evalGETSET(args []string, store *dstore.Store) []byte {
 }
 
 func evalFLUSHDB(args []string, store *dstore.Store) []byte {
-	slog.Info("FLUSHDB called", slog.Any("args", args))
+	logger.Info("FLUSHDB called", slog.Any("args", args))
 	if len(args) > 1 {
 		return diceerrors.NewErrArity("FLUSHDB")
 	}

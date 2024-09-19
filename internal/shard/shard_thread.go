@@ -7,13 +7,12 @@ import (
 	"sync"
 	"time"
 
-	"log/slog"
-
 	"github.com/dicedb/dice/config"
 	"github.com/dicedb/dice/internal/auth"
 	"github.com/dicedb/dice/internal/clientio"
 	diceerrors "github.com/dicedb/dice/internal/errors"
 	"github.com/dicedb/dice/internal/eval"
+	"github.com/dicedb/dice/internal/logger"
 	"github.com/dicedb/dice/internal/ops"
 	"github.com/dicedb/dice/internal/server/utils"
 	dstore "github.com/dicedb/dice/internal/store"
@@ -35,11 +34,11 @@ type ShardThread struct {
 	errorChan        chan *ShardError                   // errorChan is the channel for sending system-level errors.
 	lastCronExecTime time.Time                          // lastCronExecTime is the last time the shard executed cron tasks.
 	cronFrequency    time.Duration                      // cronFrequency is the frequency at which the shard executes cron tasks.
-	logger           *slog.Logger                       // logger is the logger for the shard.
+	logger           *logger.Logger                     // logger is the logger for the shard.
 }
 
 // NewShardThread creates a new ShardThread instance with the given shard id and error channel.
-func NewShardThread(id ShardID, errorChan chan *ShardError, watchChan chan dstore.WatchEvent, logger *slog.Logger) *ShardThread {
+func NewShardThread(id ShardID, errorChan chan *ShardError, watchChan chan dstore.WatchEvent, logger *logger.Logger) *ShardThread {
 	return &ShardThread{
 		id:               id,
 		store:            dstore.NewStore(watchChan),
@@ -137,7 +136,7 @@ func (shard *ShardThread) executeCommand(op *ops.StoreOp) []byte {
 func (shard *ShardThread) cleanup() {
 	close(shard.ReqChan)
 	if !config.DiceConfig.Server.WriteAOFOnCleanup {
-		slog.Info("Skipping AOF dump.")
+		shard.logger.Info("Skipping AOF dump.")
 		return
 	}
 
